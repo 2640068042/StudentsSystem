@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzm.mapper.StudentMapper">
+<resultMap id="studentResultMapper" type="Student">
+    <result property="homeAddress" column="home_address"></result>
+    <result property="studentNumber" column="stu_number"></result>
+    <result property="telephoneNumber" column="telephone_number"></result>
+</resultMap>
+
+    <insert id="insert" >
+        insert into student_system.students (stu_number, gender, home_address, telephone_number,name)
+        values (#{studentNumber},#{gender},#{homeAddress},#{telephoneNumber},#{name})
+    </insert>
+    <update id="update">
+        update student_system.students
+        <set>
+            <if test="gender !=null and gender!=''">
+                gender=#{gender},
+            </if>
+            <if test="homeAddress !=null and homeAddress!=''">
+                home_address=#{homeAddress},
+            </if>
+            <if test="telephoneNumber !=null and telephoneNumber!=''">
+                telephone_number=#{telephoneNumber},
+            </if>
+            <if test="telephoneNumber !=null and telephoneNumber!=''">
+                name=#{name},
+            </if>
+        </set>
+            where stu_number=${studentNumber}
+    </update>
+    <delete id="deleteByStudentNumber" >
+        delete from student_system.students where stu_number=#{num}
+    </delete>
+
+    <select id="selectAll" resultMap="studentResultMapper">
+        select * from student_system.students order by stu_number
+    </select>
+    <select id="selectByStudentNumber" resultMap="studentResultMapper">
+        select * from student_system.students where stu_number=#{num}
+    </select>
+
+</mapper>

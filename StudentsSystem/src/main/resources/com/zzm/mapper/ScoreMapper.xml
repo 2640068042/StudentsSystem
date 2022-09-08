@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzm.mapper.ScoreMapper">
+    <resultMap id="scoreResultMapper" type="com.zzm.pojo.Score">
+        <result column="stu_number" property="studentNumber"></result>
+        <result column="average_score" property="averageScore"></result>
+        <result column="stu_score" property="studentScore"></result>
+        <result column="moral_score" property="moralScore"></result>
+        <result column="teacher_score" property="teacherScore"></result>
+        <result column="final_score" property="finalScore"></result>
+        <result column="final_position" property="fianlPosition"></result>
+    </resultMap>
+
+    <insert id="insert">
+        insert into student_system.score(stu_number, chinese, math, english, average_score, position, stu_score, moral_score, teacher_score, final_score, final_position)
+        values (#{studentNumber},#{chinese},#{math},#{english},#{averageScore},#{position},#{studentScore},#{moralScore},#{teacherScore},#{finalScore},#{fianlPosition})
+    </insert>
+    <update id="updateFinalPosition">
+        update student_system.score set final_position=(
+        select count(*) from (
+        SELECT * from
+        (select a.stu_number, a.final_score as aa,b.final_score as ab
+        from
+        score a,
+        score b
+        ORDER BY stu_number) as t1 where aa &lt;= ab
+        ) as t2 where t2.stu_number=score.stu_number
+        )
+    </update>
+    <update id="updateFinalScore">
+        update student_system.score a set a.final_score=
+        (a.average_score*0.6+a.stu_score*0.1+a.moral_score*0.1+a.teacher_score*0.2)
+    </update>
+    <update id="updateAverageScore">
+        update student_system.score  set average_score=(chinese+english+math)/3
+    </update>
+    <update id="updatePosition">
+        update student_system.score set position=(
+        select count(*) from (
+        SELECT * from
+        (select a.stu_number, a.average_score as aa,b.average_score as ab
+        from
+        score a,
+        score b
+        ORDER BY stu_number) as t1 where aa &lt;= ab
+        ) as t2 where t2.stu_number=score.stu_number
+        )
+    </update>
+    <update id="updateByStudentNumber">
+        update student_system.score
+        <set>
+            <if test="chinese !=null">
+                chinese=#{chinese},
+            </if>
+            <if test="math!=null">
+               math=#{math},
+            </if>
+            <if test="english!=null">
+                english=#{english},
+            </if>
+            <if test="studentScore!=null">
+                stu_score=#{studentScore},
+            </if>
+            <if test="moralScore!=null">
+                moral_score=#{moralScore},
+            </if>
+            <if test="teacherScore!=null">
+                teacher_score=#{teacherScore},
+            </if>
+        </set>
+            where stu_number=#{studentNumber}
+    </update>
+    <delete id="deleteByStudentNumber">
+        delete from student_system.score where stu_number=#{num}
+    </delete>
+
+    <select id="selectAll" resultMap="scoreResultMapper">
+        select * from student_system.score order by stu_number
+    </select>
+    <select id="selectByStudentNumberScore" resultMap="scoreResultMapper">
+        select * from student_system.score
+        where stu_number=#{num}
+    </select>
+
+</mapper>
